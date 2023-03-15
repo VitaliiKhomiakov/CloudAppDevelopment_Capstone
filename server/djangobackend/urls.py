@@ -18,7 +18,14 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+from djangoapp.views import get_view_test_page
+from djangoapp.views import about_us
+from djangoapp.views import contact_us
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('djangoapp/', include('djangoapp.urls')),
+    path('djangoapp/test', get_view_test_page),
+    path('djangoapp/about', about_us),
+    path('djangoapp/contact', contact_us),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
