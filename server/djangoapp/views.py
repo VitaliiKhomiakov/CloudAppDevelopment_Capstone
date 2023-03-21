@@ -10,6 +10,8 @@ from datetime import datetime
 import logging
 import json
 
+from .restapis import get_dealers_from_cf, get_dealer_by_id, get_dealer_reviews_from_cf, post_request
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -39,9 +41,25 @@ logger = logging.getLogger(__name__)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
-    context = {}
     if request.method == "GET":
-        return render(request, 'djangoapp/index.html', context)
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/d8e38deb-4063-49c9-a27b-c9eb3d80bdad/api/dealership"
+        # Get dealers from the URL
+        dealerships = get_dealers_from_cf(url)
+        # Concat all dealer's short name
+        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        # Return a list of dealer short name
+        return HttpResponse(dealer_names)
+    # context = {}
+    # if request.method == "GET":
+    #     return render(request, 'djangoapp/index.html', context)
+
+
+def get_dealership(request):
+    if request.method == "GET":
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/d8e38deb-4063-49c9-a27b-c9eb3d80bdad/api/dealership"
+        # Get dealers from the URL
+        dealerships = get_dealer_by_id(url, "7c97b90dce394280045a0e50d4eed89b")
+        return HttpResponse(dealerships)
 
 
 def get_view_test_page(request):
@@ -121,10 +139,28 @@ def registration_request(request):
             return redirect("djangoapp:index")
         else:
             return render(request, 'djangoapp/registration.html', context)
-# Create a `get_dealer_details` view to render the reviews of a dealer
-# def get_dealer_details(request, dealer_id):
-# ...
 
-# Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
-# ...
+
+def get_dealer_details(request, dealer_id):
+    url = 'https://us-south.functions.appdomain.cloud/api/v1/web/d8e38deb-4063-49c9-a27b-c9eb3d80bdad/api/review'
+
+    reviews = get_dealer_reviews_from_cf(url, dealer_id)
+
+    return HttpResponse(reviews)
+
+
+def add_review(request, dealer_id):
+    if not request.user.is_authenticated:
+        return HttpResponse("You must be logged in to post a review.")
+
+    if request.method == 'POST':
+        review = {"time": datetime.utcnow().isoformat(), "name": request.user.username, "dealership": dealer_id,
+                  "review": request.POST.get("review"), "purchase": request.POST.get("purchase")}
+
+        json_payload = {"review": review}
+        url = "https://example.com/review-post"
+        response = post_request(url, json_payload, dealerId=dealer_id)
+        # Handle the response here
+        return HttpResponse(response.text)
+    else:
+        return render(request, "add_review.html")

@@ -20,6 +20,8 @@ urlpatterns = [
     # path for logout
 
     path(route='', view=views.get_dealerships, name='index'),
+    path(route='dealership', view=views.get_dealership, name='dealership'),
+    path(route='dealership/<int:dealer_id>/', view=views.get_dealer_details, name='dealer_details'),
     path(route='contact', view=views.contact_us, name='contact'),
     path(route='about', view=views.about_us, name='about'),
     path(route='login', view=views.login_request, name='login'),
