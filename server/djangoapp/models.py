@@ -25,3 +25,22 @@ from django.utils.timezone import now
 
 
 # <HINT> Create a plain Python class `DealerReview` to hold review data
+
+
+class CarMake(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+
+class CarModel(models.Model):
+    make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
+    dealer_id = models.PositiveIntegerField()
+    name = models.CharField(max_length=100)
+    car_type = models.CharField(max_length=20)
+    year = models.DateField()
+
+    def __str__(self):
+        return self.name
