@@ -15,6 +15,7 @@ from .restapis import get_dealers_from_cf, get_dealer_by_id, get_dealer_reviews_
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+
 def get_dealerships(request):
     if request.method == "GET":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/d8e38deb-4063-49c9-a27b-c9eb3d80bdad/api/dealership"
@@ -114,11 +115,14 @@ def get_dealer_details(request, dealer_id):
     url = 'https://us-south.functions.appdomain.cloud/api/v1/web/d8e38deb-4063-49c9-a27b-c9eb3d80bdad/api/review'
 
     reviews = get_dealer_reviews_from_cf(url, dealer_id)
+    context = {
+        "reviews": reviews
+    }
 
-    return HttpResponse(reviews)
+    return render(request, 'djangoapp/dealer_details.html', context)
 
 
-def add_review(request, dealer_id):
+def add_review(request, dealer_id=0):
     if not request.user.is_authenticated:
         return HttpResponse("You must be logged in to post a review.")
 
@@ -127,9 +131,16 @@ def add_review(request, dealer_id):
                   "review": request.POST.get("review"), "purchase": request.POST.get("purchase")}
 
         json_payload = {"review": review}
-        url = "https://example.com/review-post"
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/d8e38deb-4063-49c9-a27b-c9eb3d80bdad/api/review"
         response = post_request(url, json_payload, dealerId=dealer_id)
         # Handle the response here
         return HttpResponse(response.text)
     else:
-        return render(request, "add_review.html")
+        context = {
+            "cars": [
+                {"id": 1, "make": "Toyota", "year": "2020"},
+                {"id": 2, "make": "BMW", "year": "2021"},
+                {"id": 3, "make": "Mercedes", "year": "2018"},
+            ]
+        }
+        return render(request, "djangoapp/add_review.html", context)

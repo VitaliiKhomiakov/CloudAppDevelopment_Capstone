@@ -84,8 +84,6 @@ def get_dealer_reviews_from_cf(url, dealerId):
         # Use Watson NLU to determine sentiment
         # Replace the following line with Watson NLU code
         sentiment = analyze_review_sentiments(review['review'])
-        print('REV')
-        print(sentiment)
 
         dealer_review = DealerReview(review['dealership'],
                                      review['name'],
@@ -95,9 +93,10 @@ def get_dealer_reviews_from_cf(url, dealerId):
                                      review['car_make'],
                                      review['car_model'],
                                      review['car_year'],
-                                     sentiment,
+                                     sentiment['document']['label'],
                                      review['id']
                                      )
+
         reviews.append(dealer_review)
     return reviews
 
