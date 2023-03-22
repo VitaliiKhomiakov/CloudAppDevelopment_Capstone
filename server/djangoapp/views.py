@@ -15,49 +15,18 @@ from .restapis import get_dealers_from_cf, get_dealer_by_id, get_dealer_reviews_
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-
-# Create your views here.
-
-
-# Create an `about` view to render a static about page
-# def about(request):
-# ...
-
-
-# Create a `contact` view to return a static contact page
-# def contact(request):
-
-# Create a `login_request` view to handle sign in request
-# def login_request(request):
-# ...
-
-# Create a `logout_request` view to handle sign out request
-# def logout_request(request):
-# ...
-
-# Create a `registration_request` view to handle sign up request
-# def registration_request(request):
-# ...
-
-# Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/d8e38deb-4063-49c9-a27b-c9eb3d80bdad/api/dealership"
-        # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
-        # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        context = {'dealerships': dealerships}
         # Return a list of dealer short name
-        return HttpResponse(dealer_names)
-    # context = {}
-    # if request.method == "GET":
-    #     return render(request, 'djangoapp/index.html', context)
+        return render(request, 'djangoapp/index.html', context)
 
 
 def get_dealership(request):
     if request.method == "GET":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/d8e38deb-4063-49c9-a27b-c9eb3d80bdad/api/dealership"
-        # Get dealers from the URL
         dealerships = get_dealer_by_id(url, "7c97b90dce394280045a0e50d4eed89b")
         return HttpResponse(dealerships)
 
